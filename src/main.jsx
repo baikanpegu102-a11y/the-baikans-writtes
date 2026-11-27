@@ -130,6 +130,35 @@ function SectionHeading({ label, title, highlight, description }) {
 }
 
 function App() {
+  const [articles, setArticles] = useState(sampleArticles);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadArticles() {
+      try {
+        const snapshot = await getDocs(collection(db, "articles"));
+
+        if (isMounted && !snapshot.empty) {
+          const firebaseArticles = snapshot.docs.map((document) => ({
+            id: document.id,
+            ...document.data(),
+          }));
+
+          setArticles(firebaseArticles);
+        }
+      } catch (error) {
+        console.error("Error loading Firebase articles:", error);
+      }
+    }
+
+    loadArticles();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [selectedArticle, setSelectedArticle] = useState(null);
