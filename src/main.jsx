@@ -70,7 +70,9 @@ const portfolioItems = [
 // SAMPLE ARTICLES
 // Add your own articles here later.
 
-const sampleArticles = [ = [
+
+const sampleArticles = [
+
   {
     id: 1,
     title: "The Beginning of a New Journey",
