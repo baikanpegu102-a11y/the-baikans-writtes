@@ -1,0 +1,5 @@
+
+User-agent: *
+Allow: /
+
+Sitemap: https://the-baikans-writtes.vercel.app/sitemap.xml
