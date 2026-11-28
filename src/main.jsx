@@ -232,19 +232,40 @@ function App() {
           description="A little introduction to the person behind this creative space."
         />
 
-        <div className="about-content">
-          <div className="about-mark">B.</div>
-          <div>
+        <div
+          className="about-content"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "32px",
+            flexWrap: "wrap"
+          }}
+        >
+          <img
+            src="/baikan-profile.jpg"
+            alt="Baikan Pegu"
+            style={{
+              width: "220px",
+              height: "260px",
+              objectFit: "cover",
+              objectPosition: "center",
+              borderRadius: "18px",
+              display: "block"
+            }}
+          />
+          <div style={{ flex: "1", minWidth: "240px" }}>
             <h3>Welcome to my world.</h3>
             <p>
-              Welcome! I am Baikan. THE BAIKAN'S WRITTES is my
-              personal creative space where I share my thoughts,
-              writings, ideas, learning experiences and journey.
+              Hello! I'm Baikan Pegu, a Class 9 student from Assam, India.
+              I'm curious about artificial intelligence and technology,
+              and I enjoy exploring new ideas and learning new things.
             </p>
             <p>
-              This website brings together creativity, knowledge
-              and personal projects in one place.
+              Outside my studies, I enjoy listening to music and playing
+              games. This website is my creative space to share my
+              thoughts, writings, interests and learning journey.
             </p>
+            <p><strong>My interests:</strong> AI, technology, music and gaming.</p>
           </div>
         </div>
       </section>
