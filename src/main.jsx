@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { auth, db } from "./firebase";
@@ -75,12 +76,19 @@ const portfolioItems = [
   },
 ];
 
-// SAMPLE ARTICLES
-// Add your own articles here later.
+// GRAMMAR BOOK PAGES
+const grammarBookPages = [
+  "/books/page-1.jpeg",
+  "/books/page-2.jpeg",
+  "/books/page-3.jpeg",
+  "/books/page-4.jpeg",
+  "/books/page-5.jpeg",
+  "/books/page-6.jpeg",
+];
 
+// SAMPLE ARTICLES
 
 const sampleArticles = [
-
   {
     id: 1,
     title: "The Beginning of a New Journey",
@@ -190,6 +198,7 @@ function App() {
     setAuthError("");
     setAuthMessage("");
     setAuthLoading(true);
+
     try {
       if (authMode === "signup") {
         await createUserWithEmailAndPassword(auth, authEmail.trim(), authPassword);
@@ -198,6 +207,7 @@ function App() {
         await signInWithEmailAndPassword(auth, authEmail.trim(), authPassword);
         setAuthMessage("You are now signed in.");
       }
+
       setAuthPassword("");
     } catch (error) {
       const messages = {
@@ -207,6 +217,7 @@ function App() {
         "auth/invalid-credential": "Email or password is incorrect.",
         "auth/too-many-requests": "Too many attempts. Please wait and try again later.",
       };
+
       setAuthError(messages[error.code] || "We couldn't complete sign-in. Please try again.");
     } finally {
       setAuthLoading(false);
@@ -217,6 +228,7 @@ function App() {
     setAuthError("");
     setAuthMessage("");
     setAuthLoading(true);
+
     try {
       await signInWithPopup(auth, new GoogleAuthProvider());
       setAuthMessage("You are now signed in with Google.");
@@ -226,6 +238,7 @@ function App() {
         "auth/popup-blocked": "Your browser blocked the sign-in popup. Allow popups and try again.",
         "auth/unauthorized-domain": "This website domain is not authorized in Firebase yet.",
       };
+
       setAuthError(messages[error.code] || "Google sign-in couldn't be completed. Please try again.");
     } finally {
       setAuthLoading(false);
@@ -235,6 +248,7 @@ function App() {
   async function handleLogout() {
     setAuthError("");
     setAuthMessage("");
+
     try {
       await signOut(auth);
       setAuthMessage("You have signed out.");
@@ -242,7 +256,6 @@ function App() {
       setAuthError("Sign-out failed. Please try again.");
     }
   }
-
 
   const categories = [
     "All",
@@ -263,7 +276,11 @@ function App() {
   return (
     <div className="website">
       <nav className="navbar">
-        <a className="brand" href="#home" style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
+        <a
+          className="brand"
+          href="#home"
+          style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}
+        >
           <img
             src="/logo.png"
             alt="THE BAIKAN'S WRITTES logo"
@@ -277,6 +294,7 @@ function App() {
           <a href="#about">About</a>
           <a href="#writings">Blog</a>
           <a href="#knowledge">Knowledge</a>
+          <a href="#books">Books</a>
           <a href="#portfolio">Portfolio</a>
           <a href="#contact">Contact</a>
           <a href="#account">Login</a>
@@ -333,6 +351,7 @@ function App() {
               display: "block"
             }}
           />
+
           <div style={{ flex: "1", minWidth: "240px" }}>
             <h3>Welcome to my world.</h3>
             <p>
@@ -345,7 +364,9 @@ function App() {
               games. This website is my creative space to share my
               thoughts, writings, interests and learning journey.
             </p>
-            <p><strong>My interests:</strong> AI, technology, music and gaming.</p>
+            <p>
+              <strong>My interests:</strong> AI, technology, music and gaming.
+            </p>
           </div>
         </div>
       </section>
@@ -467,6 +488,76 @@ function App() {
         </div>
       </section>
 
+      {/* BOOKS SECTION */}
+
+      <section className="section" id="books">
+        <SectionHeading
+          label="MY BOOK COLLECTION"
+          title="My"
+          highlight="Books"
+          description="Explore my original books and learning resources."
+        />
+
+        <div className="card-grid">
+          <article className="content-card">
+            <img
+              src="/books/grammar-cover.jpeg"
+              alt="Complete English Grammar book cover"
+              style={{
+                width: "100%",
+                height: "280px",
+                objectFit: "contain",
+                borderRadius: "12px",
+                marginBottom: "20px"
+              }}
+            />
+
+            <p className="card-label">ENGLISH GRAMMAR</p>
+
+            <h3>Complete English Grammar – Class 9 & 10</h3>
+
+            <p>
+              A handwritten English Grammar book for students
+              of Classes 9 and 10.
+            </p>
+
+            <a className="text-link" href="#grammar-pages">
+              Read Book ↗
+            </a>
+          </article>
+        </div>
+
+        <div id="grammar-pages" style={{ marginTop: "50px" }}>
+          <h3 style={{ marginBottom: "25px" }}>
+            Complete English Grammar – Book Pages
+          </h3>
+
+          <div className="card-grid">
+            {grammarBookPages.map((page, index) => (
+              <article className="content-card" key={page}>
+                <p className="card-label">
+                  PAGE {index + 1}
+                </p>
+
+                <a href={page} target="_blank" rel="noreferrer">
+                  <img
+                    src={page}
+                    alt={`Grammar book page ${index + 1}`}
+                    loading="lazy"
+                    style={{
+                      width: "100%",
+                      height: "350px",
+                      objectFit: "contain",
+                      borderRadius: "10px"
+                    }}
+                  />
+                </a>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="section portfolio" id="portfolio">
         <SectionHeading
           label="MY WORK AND PROGRESS"
@@ -487,7 +578,6 @@ function App() {
         </div>
       </section>
 
-
       <section className="section" id="account">
         <SectionHeading
           label="VISITOR ACCOUNT"
@@ -495,30 +585,64 @@ function App() {
           highlight=" / Sign Up"
           description="Create an account or sign in to your visitor account."
         />
-        <div className="content-card" style={{ maxWidth: "520px", margin: "0 auto", padding: "28px" }}>
+
+        <div
+          className="content-card"
+          style={{ maxWidth: "520px", margin: "0 auto", padding: "28px" }}
+        >
           {currentUser ? (
             <div>
               <h3>Welcome!</h3>
               <p style={{ margin: "12px 0" }}>
                 Signed in as {currentUser.displayName || currentUser.email}.
               </p>
-              <button className="main-button" type="button" onClick={handleLogout}>Logout</button>
+              <button
+                className="main-button"
+                type="button"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
             </div>
           ) : (
             <>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "20px", flexWrap: "wrap" }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  marginBottom: "20px",
+                  flexWrap: "wrap"
+                }}
+              >
                 <button
                   className={authMode === "login" ? "main-button" : "text-link"}
                   type="button"
-                  onClick={() => { setAuthMode("login"); setAuthError(""); setAuthMessage(""); }}
-                >Login</button>
+                  onClick={() => {
+                    setAuthMode("login");
+                    setAuthError("");
+                    setAuthMessage("");
+                  }}
+                >
+                  Login
+                </button>
+
                 <button
                   className={authMode === "signup" ? "main-button" : "text-link"}
                   type="button"
-                  onClick={() => { setAuthMode("signup"); setAuthError(""); setAuthMessage(""); }}
-                >Sign Up</button>
+                  onClick={() => {
+                    setAuthMode("signup");
+                    setAuthError("");
+                    setAuthMessage("");
+                  }}
+                >
+                  Sign Up
+                </button>
               </div>
-              <form onSubmit={handleEmailAuth} style={{ display: "grid", gap: "14px" }}>
+
+              <form
+                onSubmit={handleEmailAuth}
+                style={{ display: "grid", gap: "14px" }}
+              >
                 <label>
                   Email address
                   <input
@@ -528,9 +652,14 @@ function App() {
                     placeholder="Enter your email"
                     autoComplete="email"
                     required
-                    style={{ display: "block", width: "100%", marginTop: "7px" }}
+                    style={{
+                      display: "block",
+                      width: "100%",
+                      marginTop: "7px"
+                    }}
                   />
                 </label>
+
                 <label>
                   Password
                   <input
@@ -538,24 +667,66 @@ function App() {
                     value={authPassword}
                     onChange={(event) => setAuthPassword(event.target.value)}
                     placeholder="At least 6 characters"
-                    autoComplete={authMode === "signup" ? "new-password" : "current-password"}
+                    autoComplete={
+                      authMode === "signup" ? "new-password" : "current-password"
+                    }
                     minLength={6}
                     required
-                    style={{ display: "block", width: "100%", marginTop: "7px" }}
+                    style={{
+                      display: "block",
+                      width: "100%",
+                      marginTop: "7px"
+                    }}
                   />
                 </label>
-                <button className="main-button" type="submit" disabled={authLoading}>
-                  {authLoading ? "Please wait..." : authMode === "signup" ? "Create Account" : "Login with Email"}
+
+                <button
+                  className="main-button"
+                  type="submit"
+                  disabled={authLoading}
+                >
+                  {authLoading
+                    ? "Please wait..."
+                    : authMode === "signup"
+                    ? "Create Account"
+                    : "Login with Email"}
                 </button>
               </form>
-              <div style={{ textAlign: "center", margin: "18px 0" }}>OR</div>
-              <button className="main-button" type="button" onClick={handleGoogleAuth} disabled={authLoading} style={{ width: "100%" }}>
+
+              <div style={{ textAlign: "center", margin: "18px 0" }}>
+                OR
+              </div>
+
+              <button
+                className="main-button"
+                type="button"
+                onClick={handleGoogleAuth}
+                disabled={authLoading}
+                style={{ width: "100%" }}
+              >
                 Continue with Google
               </button>
             </>
           )}
-          {authError && <p role="alert" style={{ color: "#ff8a8a", marginTop: "16px" }}>{authError}</p>}
-          {authMessage && <p role="status" style={{ color: "#8ee6b0", marginTop: "16px" }}>{authMessage}</p>}
+
+          {authError && (
+            <p
+              role="alert"
+              style={{ color: "#ff8a8a", marginTop: "16px" }}
+            >
+              {authError}
+            </p>
+          )}
+
+          {authMessage && (
+            <p
+              role="status"
+              style={{ color: "#8ee6b0", marginTop: "16px" }}
+            >
+              {authMessage}
+            </p>
+          )}
+
           <p style={{ fontSize: "13px", opacity: 0.75, marginTop: "18px" }}>
             Use an email account you are allowed to use. Never share your password with anyone.
           </p>
@@ -581,7 +752,11 @@ function App() {
       </section>
 
       <footer>
-        <a className="brand" href="#home" style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
+        <a
+          className="brand"
+          href="#home"
+          style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}
+        >
           <img
             src="/logo.png"
             alt="THE BAIKAN'S WRITTES logo"
@@ -589,6 +764,7 @@ function App() {
           />
           BAIKAN<span>.</span>
         </a>
+
         <p>Think. Create. Learn. Share.</p>
         <p>© 2026 THE BAIKAN'S WRITTES. All rights reserved.</p>
       </footer>
