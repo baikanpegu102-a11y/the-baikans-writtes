@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import { db } from "./firebase";
+import { auth, db } from "./firebase";
+import {
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
 import {
   collection,
   getDocs
@@ -164,6 +172,77 @@ function App() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [selectedArticle, setSelectedArticle] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authMode, setAuthMode] = useState("login");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [authMessage, setAuthMessage] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, setCurrentUser);
+    return unsubscribe;
+  }, []);
+
+  async function handleEmailAuth(event) {
+    event.preventDefault();
+    setAuthError("");
+    setAuthMessage("");
+    setAuthLoading(true);
+    try {
+      if (authMode === "signup") {
+        await createUserWithEmailAndPassword(auth, authEmail.trim(), authPassword);
+        setAuthMessage("Your account has been created successfully.");
+      } else {
+        await signInWithEmailAndPassword(auth, authEmail.trim(), authPassword);
+        setAuthMessage("You are now signed in.");
+      }
+      setAuthPassword("");
+    } catch (error) {
+      const messages = {
+        "auth/email-already-in-use": "This email already has an account. Please log in.",
+        "auth/invalid-email": "Please enter a valid email address.",
+        "auth/weak-password": "Choose a password with at least 6 characters.",
+        "auth/invalid-credential": "Email or password is incorrect.",
+        "auth/too-many-requests": "Too many attempts. Please wait and try again later.",
+      };
+      setAuthError(messages[error.code] || "We couldn't complete sign-in. Please try again.");
+    } finally {
+      setAuthLoading(false);
+    }
+  }
+
+  async function handleGoogleAuth() {
+    setAuthError("");
+    setAuthMessage("");
+    setAuthLoading(true);
+    try {
+      await signInWithPopup(auth, new GoogleAuthProvider());
+      setAuthMessage("You are now signed in with Google.");
+    } catch (error) {
+      const messages = {
+        "auth/popup-closed-by-user": "The sign-in window was closed before finishing.",
+        "auth/popup-blocked": "Your browser blocked the sign-in popup. Allow popups and try again.",
+        "auth/unauthorized-domain": "This website domain is not authorized in Firebase yet.",
+      };
+      setAuthError(messages[error.code] || "Google sign-in couldn't be completed. Please try again.");
+    } finally {
+      setAuthLoading(false);
+    }
+  }
+
+  async function handleLogout() {
+    setAuthError("");
+    setAuthMessage("");
+    try {
+      await signOut(auth);
+      setAuthMessage("You have signed out.");
+    } catch {
+      setAuthError("Sign-out failed. Please try again.");
+    }
+  }
+
 
   const categories = [
     "All",
@@ -200,6 +279,7 @@ function App() {
           <a href="#knowledge">Knowledge</a>
           <a href="#portfolio">Portfolio</a>
           <a href="#contact">Contact</a>
+          <a href="#account">Login</a>
         </div>
       </nav>
 
@@ -404,6 +484,81 @@ function App() {
               <p>{item.description}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+
+      <section className="section" id="account">
+        <SectionHeading
+          label="VISITOR ACCOUNT"
+          title="Login"
+          highlight=" / Sign Up"
+          description="Create an account or sign in to your visitor account."
+        />
+        <div className="content-card" style={{ maxWidth: "520px", margin: "0 auto", padding: "28px" }}>
+          {currentUser ? (
+            <div>
+              <h3>Welcome!</h3>
+              <p style={{ margin: "12px 0" }}>
+                Signed in as {currentUser.displayName || currentUser.email}.
+              </p>
+              <button className="main-button" type="button" onClick={handleLogout}>Logout</button>
+            </div>
+          ) : (
+            <>
+              <div style={{ display: "flex", gap: "10px", marginBottom: "20px", flexWrap: "wrap" }}>
+                <button
+                  className={authMode === "login" ? "main-button" : "text-link"}
+                  type="button"
+                  onClick={() => { setAuthMode("login"); setAuthError(""); setAuthMessage(""); }}
+                >Login</button>
+                <button
+                  className={authMode === "signup" ? "main-button" : "text-link"}
+                  type="button"
+                  onClick={() => { setAuthMode("signup"); setAuthError(""); setAuthMessage(""); }}
+                >Sign Up</button>
+              </div>
+              <form onSubmit={handleEmailAuth} style={{ display: "grid", gap: "14px" }}>
+                <label>
+                  Email address
+                  <input
+                    type="email"
+                    value={authEmail}
+                    onChange={(event) => setAuthEmail(event.target.value)}
+                    placeholder="Enter your email"
+                    autoComplete="email"
+                    required
+                    style={{ display: "block", width: "100%", marginTop: "7px" }}
+                  />
+                </label>
+                <label>
+                  Password
+                  <input
+                    type="password"
+                    value={authPassword}
+                    onChange={(event) => setAuthPassword(event.target.value)}
+                    placeholder="At least 6 characters"
+                    autoComplete={authMode === "signup" ? "new-password" : "current-password"}
+                    minLength={6}
+                    required
+                    style={{ display: "block", width: "100%", marginTop: "7px" }}
+                  />
+                </label>
+                <button className="main-button" type="submit" disabled={authLoading}>
+                  {authLoading ? "Please wait..." : authMode === "signup" ? "Create Account" : "Login with Email"}
+                </button>
+              </form>
+              <div style={{ textAlign: "center", margin: "18px 0" }}>OR</div>
+              <button className="main-button" type="button" onClick={handleGoogleAuth} disabled={authLoading} style={{ width: "100%" }}>
+                Continue with Google
+              </button>
+            </>
+          )}
+          {authError && <p role="alert" style={{ color: "#ff8a8a", marginTop: "16px" }}>{authError}</p>}
+          {authMessage && <p role="status" style={{ color: "#8ee6b0", marginTop: "16px" }}>{authMessage}</p>}
+          <p style={{ fontSize: "13px", opacity: 0.75, marginTop: "18px" }}>
+            Use an email account you are allowed to use. Never share your password with anyone.
+          </p>
         </div>
       </section>
 
